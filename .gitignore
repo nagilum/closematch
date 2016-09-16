@@ -1,2 +1,4 @@
 CloseMatchCmdApp/bin/
 CloseMatchCmdApp/obj/
+*.suo
+*.user
