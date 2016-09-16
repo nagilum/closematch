@@ -7,8 +7,8 @@
     <ProjectGuid>{178AB71F-3B08-4610-83C9-E650B48168EE}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CloseMatchCmdApp</RootNamespace>
-    <AssemblyName>CloseMatchCmdApp</AssemblyName>
+    <RootNamespace>cm</RootNamespace>
+    <AssemblyName>cm</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
