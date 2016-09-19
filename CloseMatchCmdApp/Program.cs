@@ -5,10 +5,13 @@ using System.Linq;
 
 namespace CloseMatchCmdApp {
 	internal class Program {
+		/// <summary>
+		/// Main program entry.
+		/// </summary>
 		private static void Main(string[] args) {
 			var strings = new List<string>();
 			var charsApart = 0;
-			var linesApart = 5;
+			var linesApart = 2;
 			var path = Environment.CurrentDirectory;
 			var extensions = "*.*";
 			var recursive = false;
@@ -137,28 +140,120 @@ namespace CloseMatchCmdApp {
 						continue;
 
 					var hits = 0;
-					var hitLines = new List<int>();
+					var hitLines = new List<string>();
 					var outputs = new List<string>();
 
 					for (var i = 0; i < lines.Length; i++) {
-						var lineSps = new int[strings.Count];
-
-						lineSps[0] = lines[i].IndexOf(strings[0], StringComparison.InvariantCultureIgnoreCase);
-
-						if (lineSps[0] == -1)
+						if (lines[i].IndexOf(strings[0], StringComparison.InvariantCultureIgnoreCase) == -1)
 							continue;
 
 						var hit = false;
 
-						if (strings.Count > 1) {}
+						if (strings.Count > 1) {
+							var sli = i - linesApart < 0 ? 0 : i - linesApart;
+							var eli = i + linesApart >= lines.Length ? lines.Length : i + linesApart;
+							var sps = new Dictionary<int, List<int>>();
+
+							for (var j = sli; j < eli; j++)
+								sps.Add(
+									j,
+									strings
+										.Select(t => lines[j].IndexOf(t, StringComparison.InvariantCultureIgnoreCase))
+										.ToList());
+
+							if (!sps.Any())
+								sps.Add(
+									i,
+									strings
+										.Select(t => lines[i].IndexOf(t, StringComparison.InvariantCultureIgnoreCase))
+										.ToList());
+
+							if (charsApart > 0) {
+								var shits = 1;
+								var spm = sps[i][0];
+
+								for (var j = 1; j < strings.Count; j++) {
+									for (var k = sli; k < eli; k++) {
+										var spc = sps[k][j];
+										int diff;
+
+										if (spm > spc)
+											diff = spm - spc;
+										else
+											diff = spc - spm;
+
+										if (diff >= charsApart)
+											continue;
+
+										shits++;
+										break;
+									}
+								}
+
+								if (shits == strings.Count) {
+									hit = true;
+									hitLines.Add(string.Format("{0} to {1}", sli + 1, eli + 1));
+
+									if (verbose) {
+										for (var j = sli; j < eli; j++)
+											ConsoleWriteLineHighlightWords(
+												string.Format(
+													"[{0}] {1}",
+													j,
+													lines[j].Trim()), strings);
+
+										Console.WriteLine();
+									}
+								}
+							}
+							else {
+								var shits = 0;
+
+								for (var j = 0; j < strings.Count; j++) {
+									var shit = false;
+
+									for (var k = sli; k < eli; k++) {
+										if (sps[k][j] <= -1)
+											continue;
+
+										shit = true;
+										break;
+									}
+
+									if (shit)
+										shits++;
+								}
+
+								if (shits == strings.Count) {
+									hit = true;
+									hitLines.Add(string.Format("{0} to {1}", sli + 1, eli + 1));
+
+									if (verbose) {
+										for (var j = sli; j < eli; j++)
+											ConsoleWriteLineHighlightWords(
+												string.Format(
+													"[{0}] {1}",
+													j,
+													lines[j].Trim()), strings);
+
+										Console.WriteLine();
+									}
+								}
+							}
+						}
 						else {
 							hit = true;
+							hitLines.Add((i + 1).ToString());
+
+							if (verbose) {
+								ConsoleWriteLineHighlightWords(string.Format("[{0}] {1}", i, lines[i].Trim()), strings);
+								Console.WriteLine();
+							}
 						}
 
 						if (!hit)
 							continue;
-
-						hitLines.Add(i + 1);
+						
 						hits++;
 					}
 
@@ -189,9 +284,51 @@ namespace CloseMatchCmdApp {
 				"Found {0} hits in {1} files matching criteria.",
 				hitMatches,
 				fileMatches);
+		}
 
-			// TODO: Remove!!!
-			Console.ReadKey();
+		/// <summary>
+		/// Writes out the line to console with highlight for the given words.
+		/// </summary>
+		private static void ConsoleWriteLineHighlightWords(string line, List<string> words) {
+			var writes = new List<string>();
+
+			while (true) {
+				var hit = false;
+
+				foreach (var word in words) {
+					if (!line.StartsWith(word, StringComparison.InvariantCultureIgnoreCase))
+						continue;
+
+					writes.Add(word);
+					line = line.Substring(word.Length);
+					hit = true;
+					break;
+				}
+
+				if (hit)
+					continue;
+
+				writes.Add(line.Substring(0, 1));
+				line = line.Substring(1);
+
+				if (line.Length == 0)
+					break;
+			}
+
+			foreach (var write in writes) {
+				if (words.Contains(write)) {
+					Console.BackgroundColor = ConsoleColor.DarkCyan;
+					Console.ForegroundColor = ConsoleColor.White;
+				}
+
+				Console.Write(write);
+
+				if (words.Contains(write)) {
+					Console.ResetColor();
+				}
+			}
+
+			Console.Write(Environment.NewLine);
 		}
 	}
 }
