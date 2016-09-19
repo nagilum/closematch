@@ -21,38 +21,47 @@ namespace CloseMatchCmdApp {
 
 			for (var i = 0; i < args.Length; i++) {
 				switch (args[i]) {
+					// Add texts to search for. Require at least one.
 					case "-s":
 						if (i < args.Length) strings.Add(args[i + 1]);
 						break;
 
+					// Make sure each string match is no further than n chars away. Defaults to 0.
 					case "-c":
 						if (i < args.Length) int.TryParse(args[i + 1], out charsApart);
 						break;
 
+					// Make sure each string match is no further than n lines away. Defaults to 5.
 					case "-l":
 						if (i < args.Length) int.TryParse(args[i + 1], out linesApart);
 						break;
 
+					// Set path to search in. Defaults to current working directory.
 					case "-p":
 						if (i < args.Length) path = args[i + 1];
 						break;
 
+					// Set extensions to search for. Defaults to *.*
 					case "-e":
 						if (i < args.Length) extensions = args[i + 1].Replace(",", ";");
 						break;
 
+					// Do a recursive scan. Defaults to off.
 					case "-r":
 						recursive = true;
 						break;
 
+					// Output not only the files with hits and the lines, but also the actual text. Defaults to off.
 					case "-v":
 						verbose = true;
 						break;
 
+					// Shows errors, if any. Defatults to off.
 					case "-x":
 						showErrors = true;
 						break;
 
+					// Displays help. Will also trigger if no strings are given.
 					case "-h":
 						displayHelp = true;
 						break;
