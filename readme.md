@@ -14,3 +14,9 @@ Usage:
 * ```-r``` Do a recursive scan. Defaults to off.
 * ```-v``` Output not only the files with hits and the lines, but also the actual text. Defaults to off.
 * ```-x``` Shows errors, if any. Defatults to off.
+
+### Example of Usage
+
+If you run the command ```cm -s findex -s folders -v -r -x -e *.cs``` inside the CloseMatch source code folder, you'd get the following results:
+
+![Example of usage](//raw.githubusercontent.com/nagilum/closematch/master/closematch-example.png)
